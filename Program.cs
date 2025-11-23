@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Dict
+namespace WordTrainer
 {
     internal class Program
     {
