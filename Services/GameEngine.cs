@@ -82,7 +82,7 @@ namespace WordTrainer.Services
 
         private string GenerateRandomLetters(string difficulty)
         {
-            const string vowels = "AEIOUYÅÄÖ";
+            const string vowels = "AEIOUY";
             const string consonants = "BCDFGHJKLMNPQRSTVWXZ";
             int count = _settings.GetLetterCount(difficulty);
 

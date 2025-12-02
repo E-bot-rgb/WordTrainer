@@ -31,7 +31,7 @@ namespace WordTrainer.UI
             AnsiConsole.Write(table);
             AnsiConsole.WriteLine();
 
-            var panel = new Panel($"[bold green]Letters: {round.LetterCombination}[/]\n[dim]Time Left: {round.RemainingTime()}s[/]")
+            var panel = new Panel($"[bold green]Bokstäver: {round.LetterCombination}[/]\n[dim]Tid Kvar: {round.RemainingTime()}s[/]")
                 .Border(BoxBorder.Double)
                 .BorderColor(Color.Yellow);
 

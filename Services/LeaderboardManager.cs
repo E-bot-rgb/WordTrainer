@@ -13,7 +13,7 @@ namespace WordTrainer.Services
 
     public class LeaderboardManager
     {
-        private const string LEADERBOARD_FILE = "Data/leaderboard.json";
+        private const string LEADERBOARD_FILE = "C:\\Users\\Administratör\\Desktop\\skola\\Loops\\Dict\\Data\\leaderboard.json";
         private List<LeaderboardEntry> _entries = new();
 
         public LeaderboardManager()

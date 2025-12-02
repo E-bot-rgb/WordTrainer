@@ -1,144 +1,138 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using Spectre.Console;
+using WordTrainer.Models;
+using WordTrainer.Services;
+using WordTrainer.UI;
 
 namespace WordTrainer
 {
     internal class Program
     {
+        static MenuManager menu = new();
+        static GameDisplay display = new();
+        static GameEngine engine = new();
+        static LeaderboardManager leaderboard = new();
+
         static void Main(string[] args)
         {
+            ShowWelcome();
+
             while (true)
             {
-                int mainChoice = ShowMenu("Main Menu", new string[] { "Play", "Exit" });
+                int choice = menu.ShowMenu("HUVUDMENY", new[] {
+                    "🎮 Spela",
+                    "🏆 Topplista",
+                    "⚙️ Inställningar",
+                    "🚪 Avsluta"
+                });
 
-                if (mainChoice == 0) // Play
+                switch (choice)
                 {
-                    int difficultyChoice = ShowMenu("Select Difficulty", new string[] { "Easy", "Normal", "Hard" });
-                    string difficulty = GetDifficultyName(difficultyChoice);
-
-                    string letters = GenerateLetters(difficulty);
-                    Console.Clear();
-                    Console.WriteLine($"Generated Letters ({difficulty}): {letters}");
-
-                    Console.Write("Enter part of a word to search: ");
-                    string GivenWord = Console.ReadLine();
-
-                    var getWords = GetWords(GivenWord);
-                    Console.WriteLine("\nWords containing the given string:");
-                    Console.WriteLine(getWords.Count > 0 ? string.Join(", ", getWords) : "No matches found.");
-
-                    Console.WriteLine("\nPress any key to return to the main menu...");
-                    Console.ReadKey(true);
-                }
-                else if (mainChoice == 1) // Exit
-                {
-                    Console.Clear();
-                    Console.WriteLine("Goodbye!");
-                    break;
+                    case 0:
+                        PlayGame();
+                        break;
+                    case 1:
+                        ShowLeaderboard();
+                        break;
+                    case 2:
+                        ShowSettings();
+                        break;
+                    case 3:
+                        AnsiConsole.Clear();
+                        AnsiConsole.MarkupLine("[yellow]Tack för att du spelade! 👋[/]");
+                        return;
                 }
             }
         }
 
-        static int ShowMenu(string title, string[] options)
+        static void ShowWelcome()
         {
-            int selectedIndex = 0;
-            ConsoleKey key;
-
-            do
-            {
-                Console.Clear();
-                Console.WriteLine(title + ":\n");
-
-                for (int i = 0; i < options.Length; i++)
-                {
-                    if (i == selectedIndex)
-                    {
-                        Console.BackgroundColor = ConsoleColor.White;
-                        Console.ForegroundColor = ConsoleColor.Black;
-                        Console.WriteLine($"> {options[i]}");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.WriteLine($"  {options[i]}");
-                    }
-                }
-
-                key = Console.ReadKey(true).Key;
-
-                switch (key)
-                {
-                    case ConsoleKey.UpArrow:
-                        selectedIndex = (selectedIndex == 0) ? options.Length - 1 : selectedIndex - 1;
-                        break;
-
-                    case ConsoleKey.DownArrow:
-                        selectedIndex = (selectedIndex == options.Length - 1) ? 0 : selectedIndex + 1;
-                        break;
-                }
-
-            } while (key != ConsoleKey.Enter);
-
-            return selectedIndex;
+            AnsiConsole.Clear();
+            AnsiConsole.Write(
+                new FigletText("BOMB PARTY")
+                    .Centered()
+                    .Color(Color.Red));
+            AnsiConsole.MarkupLine("[dim]Tryck på valfri tangent för att börja...[/]");
+            Console.ReadKey(true);
         }
 
-        static string GetDifficultyName(int index)
+        static void PlayGame()
         {
-            return index switch
+            // Välj svårighetsgrad
+            int diffChoice = menu.ShowMenu("Välj svårighetsgrad", new[] { "Easy", "Normal", "Hard" });
+            string difficulty = diffChoice switch
             {
                 0 => "Easy",
                 1 => "Normal",
                 2 => "Hard",
-                _ => "Unknown"
+                _ => "Normal"
             };
-        }
 
-        static List<string> GetWords(string input)
-        {
-            string path = "Words.txt";
-            List<string> foundWords = new();
+            // Lägg till spelare
+            int playerCount = menu.GetPlayerCount();
+            List<Player> players = new();
 
-            foreach (string word in File.ReadLines(path))
+            for (int i = 1; i <= playerCount; i++)
             {
-                if (word.Contains(input, StringComparison.OrdinalIgnoreCase))
+                string name = menu.GetPlayerName(i);
+                players.Add(new Player(name));
+            }
+
+            // Starta spelsession
+            GameSession session = new(players, difficulty);
+
+            // Huvudspelloop
+            while (session.GetAlivePlayers().Count > 1)
+            {
+                Round round = engine.StartNewRound(session);
+                display.ShowGameState(session, round);
+
+                // Hämta input från spelare
+                AnsiConsole.MarkupLine($"\n[cyan]{round.CurrentPlayer.Name}s tur![/]");
+                string input = AnsiConsole.Ask<string>("[green]Skriv ett ord:[/]").Trim();
+
+                // Validera svar
+                var (success, message) = engine.ValidateAnswer(input, round);
+
+                if (success)
                 {
-                    foundWords.Add(word);
+                    int points = engine.CalculateScore(round, input);
+                    round.CurrentPlayer.AddScore(points);
+                    round.CurrentPlayer.AddUsedWord(input);
+                    display.ShowRoundResult(true, message, points);
                 }
+                else
+                {
+                    round.CurrentPlayer.LoseLife();
+                    display.ShowRoundResult(false, message);
+                }
+
+                System.Threading.Thread.Sleep(1500);
+                session.NextPlayer();
+                session.RoundNumber++;
             }
 
-            return foundWords;
-        }
-
-        static string GenerateLetters(string difficulty)
-        {
-            Random rand = new();
-            string path = "found.txt";
-            List<string> words = new(File.ReadLines(path));
-
-            // Difficulty can affect how letters are selected.
-            // This is a placeholder; adjust logic as needed.
-            string selectedWord = difficulty switch
+            // Visa vinnare
+            var winner = session.GetWinner();
+            if (winner != null)
             {
-                "Easy" => words[rand.Next(words.Count)].Substring(0, Math.Min(3, words[0].Length)),
-                "Normal" => words[rand.Next(words.Count)],
-                "Hard" => ShuffleString(words[rand.Next(words.Count)]),
-                _ => words[rand.Next(words.Count)]
-            };
-
-            return selectedWord;
-        }
-
-        static string ShuffleString(string input)
-        {
-            Random rand = new();
-            char[] array = input.ToCharArray();
-            for (int i = array.Length - 1; i > 0; i--)
-            {
-                int j = rand.Next(i + 1);
-                (array[i], array[j]) = (array[j], array[i]);
+                display.ShowWinner(winner);
+                leaderboard.AddEntry(winner, difficulty);
             }
-            return new string(array);
+
+            menu.Pause();
+        }
+
+        static void ShowLeaderboard()
+        {
+            var entries = leaderboard.GetTopScores();
+            display.ShowLeaderboard(entries);
+            menu.Pause();
+        }
+
+        static void ShowSettings()
+        {
+            AnsiConsole.MarkupLine("[yellow]Inställningar kommer snart...[/]");
+            menu.Pause();
         }
     }
 }
