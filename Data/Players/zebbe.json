@@ -1,0 +1,229 @@
+{
+  "PlayerName": "Zebbe",
+  "CreatedDate": "2025-12-09T09:46:56.2503029+01:00",
+  "LastPlayed": "2025-12-09T09:58:01.1471484+01:00",
+  "TotalMatches": 6,
+  "TotalWins": 2,
+  "TotalScore": 326,
+  "BestScore": 165,
+  "MatchHistory": [
+    {
+      "MatchDate": "2025-12-09T09:46:56.206761+01:00",
+      "Difficulty": "Easy",
+      "Score": 0,
+      "RoundsPlayed": 0,
+      "LivesRemaining": 3,
+      "Won": true,
+      "WordsUsed": [],
+      "TotalPlayTime": "00:00:00.0444833",
+      "RoundPerformances": []
+    },
+    {
+      "MatchDate": "2025-12-09T09:47:08.2790456+01:00",
+      "Difficulty": "Easy",
+      "Score": 0,
+      "RoundsPlayed": 0,
+      "LivesRemaining": 3,
+      "Won": true,
+      "WordsUsed": [],
+      "TotalPlayTime": "00:00:00.0107357",
+      "RoundPerformances": []
+    },
+    {
+      "MatchDate": "2025-12-09T09:49:54.9556687+01:00",
+      "Difficulty": "Easy",
+      "Score": 63,
+      "RoundsPlayed": 5,
+      "LivesRemaining": 0,
+      "Won": false,
+      "WordsUsed": [
+        "hydrogen",
+        "poop"
+      ],
+      "TotalPlayTime": "00:00:50.7616736",
+      "RoundPerformances": [
+        {
+          "Letters": "HY",
+          "Success": true,
+          "WordUsed": "Hydrogen",
+          "TimeRemaining": 16
+        },
+        {
+          "Letters": "RY",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 13
+        },
+        {
+          "Letters": "PO",
+          "Success": true,
+          "WordUsed": "Poop",
+          "TimeRemaining": 15
+        },
+        {
+          "Letters": "HE",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 16
+        },
+        {
+          "Letters": "XO",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 0
+        }
+      ]
+    },
+    {
+      "MatchDate": "2025-12-09T09:50:58.9877542+01:00",
+      "Difficulty": "Easy",
+      "Score": 0,
+      "RoundsPlayed": 3,
+      "LivesRemaining": 0,
+      "Won": false,
+      "WordsUsed": [],
+      "TotalPlayTime": "00:00:05.6552076",
+      "RoundPerformances": [
+        {
+          "Letters": "VY",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 20
+        },
+        {
+          "Letters": "KY",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 20
+        },
+        {
+          "Letters": "MY",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 20
+        }
+      ]
+    },
+    {
+      "MatchDate": "2025-12-09T09:55:58.7765792+01:00",
+      "Difficulty": "Easy",
+      "Score": 165,
+      "RoundsPlayed": 8,
+      "LivesRemaining": 0,
+      "Won": false,
+      "WordsUsed": [
+        "suck",
+        "omega",
+        "veins",
+        "doomsday",
+        "looping"
+      ],
+      "TotalPlayTime": "00:00:34.1742706",
+      "RoundPerformances": [
+        {
+          "Letters": "UC",
+          "Success": true,
+          "WordUsed": "Suck",
+          "TimeRemaining": 16
+        },
+        {
+          "Letters": "OM",
+          "Success": true,
+          "WordUsed": "Omega",
+          "TimeRemaining": 18
+        },
+        {
+          "Letters": "VE",
+          "Success": true,
+          "WordUsed": "Veins",
+          "TimeRemaining": 18
+        },
+        {
+          "Letters": "YC",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 16
+        },
+        {
+          "Letters": "DO",
+          "Success": true,
+          "WordUsed": "Doomsday",
+          "TimeRemaining": 17
+        },
+        {
+          "Letters": "OO",
+          "Success": true,
+          "WordUsed": "Looping",
+          "TimeRemaining": 17
+        },
+        {
+          "Letters": "RE",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 20
+        },
+        {
+          "Letters": "ZO",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 20
+        }
+      ]
+    },
+    {
+      "MatchDate": "2025-12-09T09:57:21.7750845+01:00",
+      "Difficulty": "Easy",
+      "Score": 98,
+      "RoundsPlayed": 6,
+      "LivesRemaining": 0,
+      "Won": false,
+      "WordsUsed": [
+        "overall",
+        "urban",
+        "led"
+      ],
+      "TotalPlayTime": "00:00:39.3720573",
+      "RoundPerformances": [
+        {
+          "Letters": "OV",
+          "Success": true,
+          "WordUsed": "Overall",
+          "TimeRemaining": 18
+        },
+        {
+          "Letters": "UA",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 14
+        },
+        {
+          "Letters": "FE",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 14
+        },
+        {
+          "Letters": "UR",
+          "Success": true,
+          "WordUsed": "Urban",
+          "TimeRemaining": 17
+        },
+        {
+          "Letters": "ED",
+          "Success": true,
+          "WordUsed": "Led",
+          "TimeRemaining": 18
+        },
+        {
+          "Letters": "CH",
+          "Success": false,
+          "WordUsed": null,
+          "TimeRemaining": 12
+        }
+      ]
+    }
+  ],
+  "TotalWordsUsed": 10,
+  "WinRate": 33.33333333333333,
+  "AverageScore": 54.333333333333336
+}

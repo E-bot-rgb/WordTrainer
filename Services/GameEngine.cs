@@ -1,5 +1,8 @@
 ﻿using WordTrainer.Models;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace WordTrainer.Services
 {
@@ -7,13 +10,42 @@ namespace WordTrainer.Services
     {
         private WordValidator _validator;
         private GameSettings _settings;
-        private Random _random = new();
-        private const string LETTERS_FILE = "Data/found.txt";
+        private Random _random = new Random(); // Viktigt: en instans för hela klassen
+        private readonly string LETTERS_FILE;
+        private List<string> _letterPool = new(); // Cache för bokstavskombinationer
 
         public GameEngine()
         {
             _validator = new WordValidator();
             _settings = new GameSettings();
+
+            // Samma fix som tidigare för path
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string projectRoot = Path.GetFullPath(Path.Combine(baseDirectory, @"..\..\..\"));
+            LETTERS_FILE = Path.Combine(projectRoot, "Data", "found.txt");
+
+            // Ladda bokstavskombinationer vid start
+            LoadLetterPool();
+        }
+
+        /// <summary>
+        /// Ladda alla möjliga bokstavskombinationer från fil
+        /// </summary>
+        private void LoadLetterPool()
+        {
+            if (File.Exists(LETTERS_FILE))
+            {
+                _letterPool = File.ReadAllLines(LETTERS_FILE)
+                    .Where(line => !string.IsNullOrWhiteSpace(line))
+                    .Select(line => line.Trim().ToUpper())
+                    .ToList();
+
+                Console.WriteLine($"✅ Laddade {_letterPool.Count} bokstavskombinationer");
+            }
+            else
+            {
+                Console.WriteLine($"⚠️ Hittar inte {LETTERS_FILE}, använder random generation");
+            }
         }
 
         public Round StartNewRound(GameSession session)
@@ -56,45 +88,114 @@ namespace WordTrainer.Services
             return baseScore + timeBonus + lengthBonus;
         }
 
+        /// <summary>
+        /// Generera slumpmässiga bokstäver baserat på svårighetsgrad
+        /// </summary>
         private string GenerateLetters(string difficulty)
         {
-            if (!File.Exists(LETTERS_FILE))
-            {
-                // Fallback: generera slumpmässiga bokstäver
-                return GenerateRandomLetters(difficulty);
-            }
-
-            var words = File.ReadAllLines(LETTERS_FILE);
-            if (words.Length == 0) return GenerateRandomLetters(difficulty);
-
-            string selectedWord = words[_random.Next(words.Length)];
             int letterCount = _settings.GetLetterCount(difficulty);
 
-            // Ta ut en slumpmässig sekvens från ordet
-            if (selectedWord.Length >= letterCount)
+            // BÄSTA METODEN: Generera från riktiga ord i ordlistan
+            // Detta garanterar att det alltid finns ord att hitta!
+            string letters = GenerateFromDictionary(letterCount);
+
+            if (!string.IsNullOrEmpty(letters))
             {
-                int startIndex = _random.Next(0, selectedWord.Length - letterCount + 1);
-                return selectedWord.Substring(startIndex, letterCount).ToUpper();
+                return letters;
             }
 
-            return GenerateRandomLetters(difficulty);
+            // Fallback 1: Använd loaded pool om tillgänglig
+            if (_letterPool.Count > 0)
+            {
+                return GenerateFromPool(letterCount);
+            }
+
+            // Fallback 2: Generera helt slumpmässigt
+            return GenerateRandomLetters(letterCount);
         }
 
-        private string GenerateRandomLetters(string difficulty)
+        /// <summary>
+        /// Generera från pool av ord (found.txt)
+        /// </summary>
+        private string GenerateFromPool(int letterCount)
         {
-            const string vowels = "AEIOUY";
-            const string consonants = "BCDFGHJKLMNPQRSTVWXZ";
-            int count = _settings.GetLetterCount(difficulty);
+            // Filtrera kombinationer som är rätt längd
+            var validCombos = _letterPool.Where(combo => combo.Length >= letterCount).ToList();
+
+            if (validCombos.Count == 0)
+            {
+                return GenerateRandomLetters(letterCount);
+            }
+
+            // Välj ett slumpmässigt ord
+            string selectedWord = validCombos[_random.Next(validCombos.Count)];
+
+            // Ta ut en slumpmässig sekvens
+            if (selectedWord.Length == letterCount)
+            {
+                return selectedWord;
+            }
+            else
+            {
+                int startIndex = _random.Next(0, selectedWord.Length - letterCount + 1);
+                return selectedWord.Substring(startIndex, letterCount);
+            }
+        }
+
+        /// <summary>
+        /// Generera helt slumpmässiga bokstäver
+        /// </summary>
+        private string GenerateRandomLetters(int count)
+        {
+            // Vanliga bokstavskombinationer på engelska
+            const string COMMON_CONSONANTS = "TNSRHDLCMFPGWYBVKJXQZ";
+            const string COMMON_VOWELS = "EAIOUY";
 
             string result = "";
+
             for (int i = 0; i < count; i++)
             {
-                // Blanda vokaler och konsonanter
-                string pool = (i % 2 == 0) ? consonants : vowels;
-                result += pool[_random.Next(pool.Length)];
+                // Blanda vokaler och konsonanter för mer naturliga kombinationer
+                if (i % 2 == 0 || _random.Next(100) < 30)
+                {
+                    // Vokal
+                    result += COMMON_VOWELS[_random.Next(COMMON_VOWELS.Length)];
+                }
+                else
+                {
+                    // Konsonant
+                    result += COMMON_CONSONANTS[_random.Next(COMMON_CONSONANTS.Length)];
+                }
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Generera bokstäver från faktiska ord i ordlistan (BÄSTA METODEN)
+        /// </summary>
+        public string GenerateFromDictionary(int letterCount)
+        {
+            // Hämta ett slumpmässigt ord från validator
+            var words = _validator.GetRandomWords(100); // Få 100 slumpmässiga ord
+
+            if (words.Count == 0)
+            {
+                return GenerateRandomLetters(letterCount);
+            }
+
+            // Välj ett ord som är tillräckligt långt
+            var validWords = words.Where(w => w.Length >= letterCount).ToList();
+
+            if (validWords.Count == 0)
+            {
+                return GenerateRandomLetters(letterCount);
+            }
+
+            string word = validWords[_random.Next(validWords.Count)];
+            int startPos = _random.Next(0, word.Length - letterCount + 1);
+
+            return word.Substring(startPos, letterCount).ToUpper();
         }
     }
 }
