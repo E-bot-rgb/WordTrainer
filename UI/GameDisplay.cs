@@ -15,7 +15,7 @@ namespace WordTrainer.UI
 
             foreach (var player in session.Players)
             {
-                string hearts = new string('❤', player.Lives) + new string('❤', 3 - player.Lives);
+                string hearts = new string('H', player.Lives) + new string('H', 3 - player.Lives);
                 string nameColor = player == session.CurrentPlayer ? "bold cyan" : "white";
 
                 table.AddRow(
